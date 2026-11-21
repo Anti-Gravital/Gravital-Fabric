@@ -80,3 +80,12 @@ deviation.
 No change is complete until `cargo fmt`, `cargo clippy`, `cargo test`,
 `cargo audit`, `cargo deny` and the relevant benchmarks pass, and until the
 documentation affected by the change is updated in the same commit.
+
+## 9. Kaizen adapter
+
+This file remains the technical constitution. `.kaizen/RULES.md` is a
+subordinate continuous-improvement adapter; where the two disagree, this file
+governs. Before declaring a task complete, run `scripts/kaizen check` and
+report the real result. Start a task with `scripts/kaizen start <branch>`. Never
+bypass hooks or relax `.kaizen/baseline.json` without human approval (rules K-5
+and K-10).

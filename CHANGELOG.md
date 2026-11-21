@@ -24,3 +24,12 @@ Added (documentation only; no implementation):
   native and container adapters.
 - ADR-0001 to ADR-0005 record the corresponding architectural decisions.
 - Mermaid diagrams for the layered architecture and the migration flow.
+
+### Governance
+
+- RFC-0006 and ADR-0006 authorise a Kaizen governance layer subordinate to
+  `CLAUDE.md`: `.kaizen/RULES.md`, `scripts/kaizen`, git hooks, PR descriptors,
+  a quality ratchet, a metric series and CI checks.
+- Content policies enforce the existing rules on commit length, emojis and
+  AI-tool attribution. Generated rules and templates are bilingual with
+  English canonical.

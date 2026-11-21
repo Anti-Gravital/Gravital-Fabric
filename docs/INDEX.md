@@ -12,6 +12,15 @@
 - `docs/rfc/` — proposals, with status and acceptance criteria.
 - `docs/adr/` — accepted architectural decisions.
 
+## Governance
+
+- `.kaizen/RULES.md` — continuous-improvement rules, subordinate to
+  `CLAUDE.md`.
+- `docs/kaizen/` — descriptors, retrospectives, postmortems, runbooks and
+  metric series.
+- `scripts/kaizen` and `.githooks/` — local checks and hooks.
+- RFC-0006 and ADR-0006 authorise the governance CI and hooks.
+
 ## Design artifacts
 
 - `docs/diagrams/` — Mermaid diagrams of layers, data flow and migration.

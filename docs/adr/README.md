@@ -7,3 +7,4 @@
 | 0003 | Portability levels are explicit and conditional | accepted | `0003-honest-portability-levels.md` |
 | 0004 | Storage engines are replaceable adapters | accepted | `0004-storage-engines-are-adapters.md` |
 | 0005 | Rust is the only implementation language | accepted | `0005-rust-only.md` |
+| 0006 | Kaizen is a subordinate governance adapter | accepted | `0006-kaizen-governance.md` |

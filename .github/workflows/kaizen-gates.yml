@@ -1,0 +1,52 @@
+name: kaizen-gates
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  descriptor-closing:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate descriptors
+        run: scripts/kaizen check --only descriptors
+
+  content-policy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate content policies
+        run: scripts/kaizen check --only policy
+
+  ratchet:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Add the Rust toolchain setup step once the first crate exists
+      # (ADR-0005). Project test/lint/format commands live in
+      # .kaizen/config.env and are empty until that RFC is accepted.
+      - name: Validate quality baseline
+        run: scripts/kaizen check --only ratchet
+
+  metrics:
+    if: github.event_name == 'push'
+    needs: [content-policy, ratchet]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Add the Rust toolchain setup step once the first crate exists.
+      - name: Record metrics
+        run: |
+          scripts/kaizen metrics
+          git config user.name "kaizen-bot"
+          git config user.email "kaizen-bot@users.noreply.github.com"
+          git add docs/kaizen/data/metrics.jsonl
+          if ! git diff --cached --quiet; then
+            git commit -m "Record quality metrics"
+            git push
+          fi
