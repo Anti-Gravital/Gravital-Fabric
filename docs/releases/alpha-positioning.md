@@ -6,10 +6,13 @@ exercise. English is canonical (`CLAUDE.md` section 8).
 
 ## 1. Honest position
 
-Gravital Fabric is at **specification stage**. There is no product
-implementation, no `fabric-*` crate, no published contract under `contracts/`
-and no installable node agent. The only executable code in this repository is
-an offline governance tool in `tools/kaizen-insights/`.
+Gravital Fabric is at **specification stage with one local-only prototype**.
+There is no product implementation, no installable node agent and no
+control-plane service. The prototype crate `fabric-node` discovers local
+hardware, derives a stable non-cryptographic identifier and writes a JSON
+manifest or a local state file; it is authorized by RFC-0008 for that slice
+only. One versioned JSON Schema is published under `contracts/`. The offline
+governance tool in `tools/kaizen-insights/` is also executable.
 
 The runnable alpha that exists today belongs to **Anti-Gravital**, not to
 Fabric. It is a local API prototype: scaffold a project from a template,
@@ -47,21 +50,24 @@ Anti-Gravital ADR-0016 forbid a crate dependency in either direction.
 | RFC-0005 | Functions runtime with WebAssembly capabilities |
 | RFC-0006 / RFC-0007 | Kaizen governance and the external loop |
 | ADR-0001 to ADR-0007 | Accepted architectural and governance decisions |
+| RFC-0008 and ADR-0008 | First local prototype crate, contract layout and deterministic local identity |
+| `contracts/fabric-node-manifest/v1.schema.json` | First published contract: local node manifest as JSON Schema data |
 | `docs/diagrams/` | Layered architecture and migration flow diagrams |
 
 The twelve specified engines are `fabric-node`, `fabric-compute`,
 `fabric-storage`, `fabric-network`, `fabric-scheduler`, `fabric-migration`,
 `fabric-replication`, `fabric-runtime`, `fabric-security`, `fabric-control`,
 `fabric-provider` and `fabric-metering`. Each has a contract in the
-architecture; none has an implementation in this repository.
+architecture. Only a local discovery slice of `fabric-node` has prototype code;
+the other engines and the rest of `fabric-node` have no implementation.
 
 ## 3. What is NOT implemented
 
 | Absent capability | Consequence for a tester |
 | --- | --- |
-| No `fabric-*` crate and no Cargo workspace | Nothing from Fabric can be installed or built as a product |
-| No `contracts/` directory with Protobuf, OpenAPI, JSON Schema or manifests | No generated types, no versioned contract to test against |
-| No node agent, discovery or cryptographic node identity | A physical host cannot register with Fabric |
+| Only one local prototype crate and a Cargo workspace | A host can be discovered and a local manifest or state file produced; nothing can be installed or deployed as a product |
+| Only the node manifest JSON Schema is published under `contracts/` | No generated types and no control-plane, compute or security contract exists yet |
+| No installed node agent and no cryptographic node identity | The prototype identifier is deterministic and non-cryptographic; a host cannot register with Fabric |
 | No `fabric-compute` | No container or virtual machine can be provisioned on a node |
 | No volume manager, snapshot engine or replication engine | No node-independent data, even though RFC-0003 defines the contract |
 | No control plane, inventory, scheduler or quotas | No multi-node administration |
@@ -69,8 +75,10 @@ architecture; none has an implementation in this repository.
 | No functions runtime | RFC-0005 defines it; no WebAssembly or native function runner exists |
 | No machine-interface tools | RFC-0004 section 4.5 inherits seven prerequisites from Anti-Gravital RFC-0024; `deploy.*` tools stay unimplemented until Phase 5 |
 
-RFC-0001 to RFC-0005 are accepted specifications. Acceptance is not an
-implementation and must not be read as one.
+RFC-0001 to RFC-0005 are accepted specifications. RFC-0008 authorizes a local
+prototype only. Acceptance is not an implementation and must not be read as
+one; real host output for the prototype is in
+`docs/audits/fabric-node-prototype.md`.
 
 ## 4. Contract boundary with Anti-Gravital
 
@@ -140,8 +148,8 @@ prototype and must not be reported as Fabric working.
 
 | Capability | Required engine / contract | Roadmap phase | Specification | Status |
 | --- | --- | --- | --- | --- |
-| Install an agent and discover CPU, memory, disks and network | `fabric-node`, node identity | Phase 1 | RFC-0004 section 4.1 | Not implemented |
-| Register a node with Fabric | `fabric-node`, control-plane inventory | Phase 1 | RFC-0004 | Not implemented |
+| Install an agent and discover CPU, memory, disks and network | `fabric-node`, node identity | Phase 1 | RFC-0004 section 4.1 | Prototype only: local discovery and manifest on one host, no installed agent |
+| Register a node with Fabric | `fabric-node`, control-plane inventory | Phase 1 | RFC-0004 | Prototype only: local state file, no control plane |
 | Provision containers and virtual machines | `fabric-compute`, `fabric-runtime` | Phase 1 | RFC-0004, RFC-0005 | Not implemented |
 | Export and import images with disk and configuration | `fabric-storage`, `fabric-migration` | Phase 1 | RFC-0002, RFC-0003 | Not implemented |
 | Node-independent volumes, snapshots, automated restore | `fabric-storage`, replication | Phase 2 | RFC-0003 | Not implemented |
@@ -154,10 +162,11 @@ prototype and must not be reported as Fabric working.
 
 | I want to... | Today with Anti-Gravital alone? | What is missing |
 | --- | --- | --- |
+| Discover local CPU, memory, disks and network as JSON | Yes, with the `fabric-node` local prototype | Cryptographic identity and an installed agent |
 | Create an API project from a template | Yes | Nothing |
 | Compile a DSL schema into Rust, SQL, TypeScript and OpenAPI | Yes | Nothing |
 | Run a local service and call it on loopback | Yes | Nothing |
-| Register a physical host as a Fabric node | No | Node agent and identity (Phase 1) |
+| Register a physical host as a Fabric node | No (local prototype state file only) | Cryptographic identity and control-plane registration (Phase 1) |
 | Deploy a container or VM to that host | No | `fabric-compute` (Phase 1) |
 | Keep data after a compute node is lost | No | Volumes and replication (Phase 2) |
 | Schedule across nodes with projects and quotas | No | Control plane and scheduler (Phase 3) |
@@ -192,6 +201,15 @@ fabric crate is written:
    privilege, no secrets in plans, audit records or machine-interface results
    (architecture section 8, RFC-0004 section 4.5).
 
+### Prototype status against these preconditions (2026-11-22)
+
+RFC-0008 authorizes the local prototype only. Against the list above: item 1 is
+met for the prototype; item 2 is partly met (the contract layout and one JSON
+Schema exist, generated types do not); item 4 exists only as local discovery
+and a state file; item 6 has format, lint, tests, audit and deny executed
+locally for the prototype, but no CI job for the crate yet; items 3, 5 and 7 are
+not met. The prototype does not open the Phase 1 gate.
+
 No start date is promised. Adding a crate, changing a contract or moving a phase
 requires its own RFC and ADR where applicable.
 
@@ -203,8 +221,9 @@ physical machines that registers a node, provisions a container or VM, and
 exports and imports an image with its disk and configuration, with the evidence
 required by the roadmap gate (hardware, operating system, tool versions, commit,
 methodology and number of runs). Until that evidence exists, the correct label
-for this repository is "specification-only". The Anti-Gravital testing alpha is
-not a Fabric alpha and must not be presented as one.
+for this repository is "specification stage with a local-only prototype". The
+Anti-Gravital testing alpha is not a Fabric alpha and must not be presented as
+one.
 
 ## 11. References
 
@@ -213,7 +232,10 @@ not a Fabric alpha and must not be presented as one.
 - `docs/master/GRAVITAL-FABRIC-Hoja-de-Ruta.md`
 - `docs/rfc/RFC-0001-scope-and-boundaries.md` to
   `docs/rfc/RFC-0005-functions-runtime.md`
+- `docs/rfc/RFC-0008-local-node-prototype.md`
 - `docs/adr/0001-no-compile-time-dependency-with-anti-gravital.md`
 - `docs/adr/0003-honest-portability-levels.md`
+- `docs/adr/0008-deterministic-local-node-identity.md`
+- `docs/audits/fabric-node-prototype.md` — real host evidence for the prototype
 - Anti-Gravital `docs/adr/0016-open-interfaces-between-ag-and-fabric.md` (read-only)
 - `docs/examples/anti-gravital-prototype.md`

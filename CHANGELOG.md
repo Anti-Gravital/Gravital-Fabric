@@ -5,6 +5,32 @@ published release yet; entries remain under `[Unreleased]`.
 
 ## [Unreleased]
 
+### First local node prototype (partial Phase 1)
+
+- RFC-0008 authorizes the first crate and the first versioned contract layout;
+  ADR-0008 records the deterministic, non-cryptographic local identifier used
+  by the prototype. Both are limited to the prototype slice.
+- New workspace and `crates/fabric-node`: a zero-dependency Rust binary that
+  discovers OS, architecture, logical CPU count, total memory, block devices
+  and network interfaces from std, procfs and sysfs. It prints a versioned JSON
+  manifest and writes a local state file with `register --state PATH`.
+- Published `contracts/fabric-node-manifest/v1.schema.json` (JSON Schema
+  2020-12) and a synthetic example. No generated types and no cross-repository
+  Rust dependency; contracts remain data (ADR-0001).
+- Real host evidence in `docs/audits/fabric-node-prototype.md`: verbatim
+  manifest and registration output, environment, 16 unit and 6 integration
+  tests, schema validation, format, check, clippy, audit, deny and kaizen check.
+- Documentation updated: README (EN+ES), `docs/INDEX.md`, alpha positioning,
+  external prototype pointer and the crate README. The roadmap master and its
+  Phase 1 box are unchanged: the gate stays open.
+- `scripts/kaizen` now counts an empty debt grep as zero instead of aborting
+  under `pipefail`; `.kaizen/config.env` wires format, lint and test commands.
+  The baseline remains `debt_max: 0`.
+- Explicitly not delivered: cryptographic identity, control-plane registration,
+  container or VM provisioning, image export/import, volumes, replication,
+  scheduling and the two-machine Phase 1 acceptance evidence. This is not a
+  Fabric alpha.
+
 ### Alpha positioning (documentation only)
 
 - `docs/releases/alpha-positioning.md` states honestly that Fabric is

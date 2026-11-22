@@ -11,6 +11,10 @@
 
 - `docs/rfc/` — proposals, with status and acceptance criteria.
 - `docs/adr/` — accepted architectural decisions.
+- `docs/rfc/RFC-0008-local-node-prototype.md` — first crate, contract layout and
+  kaizen wiring, authorized for the local prototype slice only.
+- `docs/adr/0008-deterministic-local-node-identity.md` — reproducible local
+  identifier; not a cryptographic credential.
 
 ## Governance
 
@@ -46,7 +50,13 @@ only. Last synchronization: 2026-11-22.
   implemented, the Anti-Gravital contract boundary, the three portability
   levels, tester decision table and Phase 1 preconditions.
 - `docs/examples/anti-gravital-prototype.md` — points testers to the external
-  Anti-Gravital alpha walkthrough and states that Fabric is specification-only.
+  Anti-Gravital alpha walkthrough and states that Fabric code for provisioning
+  and migration is still absent.
+- `crates/fabric-node/README.md` — commands, discovery sources and limitations
+  of the local-only prototype.
+- `docs/audits/fabric-node-prototype.md` — verbatim run on a real host,
+  verification results and the exact next Phase 1 steps. The Phase 1 gate is
+  still open; this is not a Fabric alpha.
 
 These documents do not change the boundary in RFC-0001 or ADR-0001; they make
 the existing boundary explicit for alpha testers.
@@ -54,8 +64,9 @@ the existing boundary explicit for alpha testers.
 ## Design artifacts
 
 - `docs/diagrams/` — Mermaid diagrams of layers, data flow and migration.
-- `contracts/` — versioned open contracts (to be created with the first
-  implementation RFC).
+- `contracts/` — versioned open contracts. The first published contract is
+  `fabric-node-manifest/v1.schema.json` with a synthetic example; it is a local
+  discovery manifest, not a control-plane registration contract.
 
 ## Language
 

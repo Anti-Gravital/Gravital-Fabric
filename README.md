@@ -65,16 +65,31 @@ and data in documented formats without an active account on the platform.
 
 ### Status
 
-Specification stage. No product implementation is published yet. The only
-executable code in the repository is an offline governance tool at
-`tools/kaizen-insights/`. The source of truth is `docs/master/`; decisions are
-in `docs/rfc/` and `docs/adr/`.
+Specification stage with one local-only prototype. The first executable product
+code is the `fabric-node` prototype crate: it discovers local CPU, memory, block
+devices and network interfaces, derives a stable non-cryptographic local
+identifier and writes a JSON manifest or a local state file. It opens no socket
+and needs no external service. The offline governance tool at
+`tools/kaizen-insights/` is also executable. The source of truth remains
+`docs/master/`; decisions are in `docs/rfc/` and `docs/adr/`.
+
+Roadmap Phase 1 is partial: no cryptographic identity, provisioning,
+control-plane registration, image export/import or two-machine acceptance
+evidence exists. This is not a Fabric alpha. See the
+[prototype evidence](docs/audits/fabric-node-prototype.md) and the
+[alpha positioning guide](docs/releases/alpha-positioning.md).
+
+From a checkout, the prototype runs with:
+
+```bash
+cargo run -p fabric-node -- manifest
+cargo run -p fabric-node -- register --state ./fabric-node-state.json
+```
 
 For alpha testers: the [alpha positioning and prototype guide](docs/releases/alpha-positioning.md)
 states what can be exercised today with the Anti-Gravital alpha and what still
 needs Fabric code. The [external prototype pointer](docs/examples/anti-gravital-prototype.md)
-links to that walkthrough. Fabric is specification-only; the Anti-Gravital alpha
-is not a Fabric alpha.
+links to that walkthrough. The Anti-Gravital alpha is not a Fabric alpha.
 
 Rust is the only implementation language. Licence: Apache-2.0.
 
@@ -144,15 +159,31 @@ snapshots y datos en formatos documentados, sin necesidad de cuenta activa.
 
 ### Estado
 
-Fase de especificacion. Aun no hay implementacion de producto publicada. El
-unico codigo ejecutable del repositorio es una herramienta de gobernanza
-sin conexion en `tools/kaizen-insights/`. La fuente de verdad es
-`docs/master/`; las decisiones estan en `docs/rfc/` y `docs/adr/`.
+Fase de especificacion con un prototipo local. El primer codigo ejecutable del
+producto es el crate `fabric-node`: descubre CPU, memoria, dispositivos de
+bloque e interfaces de red locales, deriva un identificador local determinista
+no criptografico y escribe un manifiesto JSON o un archivo de estado local. No
+abre sockets ni necesita servicios externos. La herramienta de gobernanza
+sin conexion en `tools/kaizen-insights/` tambien es ejecutable. La fuente de
+verdad sigue siendo `docs/master/`; las decisiones estan en `docs/rfc/` y
+`docs/adr/`.
+
+La Fase 1 de la hoja de ruta es parcial: no hay identidad criptografica,
+aprovisionamiento, registro en un plano de control, exportacion de imagenes ni
+evidencia de aceptacion en dos maquinas. Esto no es un alpha de Fabric. Consulte
+la [evidencia del prototipo](docs/audits/fabric-node-prototype.md) y la
+[guia de posicionamiento alpha](docs/releases/alpha-positioning.md).
+
+Desde un checkout, el prototipo se ejecuta con:
+
+```bash
+cargo run -p fabric-node -- manifest
+cargo run -p fabric-node -- register --state ./fabric-node-state.json
+```
 
 Para quienes prueban el alpha: la [guia de posicionamiento alpha y prototipo](docs/releases/alpha-positioning.md)
 indica que se puede ejecutar hoy con el alpha de Anti-Gravital y que requiere
-codigo de Fabric. El [puntero al prototipo externo](docs/examples/anti-gravital-prototype.md)
-enlaza ese recorrido. Fabric esta en fase de especificacion; el alpha de
-Anti-Gravital no es un alpha de Fabric.
+mas codigo de Fabric. El [puntero al prototipo externo](docs/examples/anti-gravital-prototype.md)
+enlaza ese recorrido. El alpha de Anti-Gravital no es un alpha de Fabric.
 
 Rust es el unico lenguaje de implementacion. Licencia: Apache-2.0.

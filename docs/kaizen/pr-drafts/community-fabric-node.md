@@ -51,8 +51,8 @@ as partial so it cannot be read as Fabric reaching alpha.
 Closes: none
 
 ## Checklist / Checklist
-- [ ] Builds / Compila
-- [ ] Tests pass / Pasa tests
-- [ ] `scripts/kaizen check` is green / en verde
-- [ ] Documentation updated / Documentacion actualizada
-- [ ] Baseline does not worsen / Linea base no empeora
+- [x] Builds / Compila
+- [x] Tests pass / Pasa tests (16 unit + 6 integration)
+- [x] `scripts/kaizen check` is green / en verde
+- [x] Documentation updated / Documentacion actualizada
+- [x] Baseline does not worsen / Linea base no empeora (debt 0 <= 0)
