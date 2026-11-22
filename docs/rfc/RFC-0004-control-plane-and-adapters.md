@@ -76,6 +76,15 @@ The capability-scoped MCP contract of RFC-0024 is implemented here with
 Fabric-specific tools under the same capability names. A connected agent
 operates projects and infrastructure through one contract.
 
+Anti-Gravital amended RFC-0024 on 2026-11-21 with seven implementation
+prerequisites (section 9 of that RFC). Fabric inherits them before any MCP
+code is written: machine-readable output, plan/apply and an audit sink in the
+consumer, the `Secret<T>` redaction contract, typed executors for every
+command group, one coherent plan model, a named owner for `contract_version`,
+and no DNS egress from a stdio-only debug interface. `deploy.*` tools remain
+unimplemented until Phase 5 exists and must not become a second control-plane
+contract alongside the open Protobuf/OpenAPI/JSON Schema definitions.
+
 ## 5. Implementation plan
 
 1. Define engine contracts and the capability schema.
@@ -101,5 +110,6 @@ An adapter is disabled by feature; the node continues with native capabilities.
 
 ## 9. References
 
-- RFC-0024 of Anti-Gravital (shared MCP contract).
+- RFC-0024 of Anti-Gravital, including its 2026-11-21 amendment (shared MCP
+  contract and implementation prerequisites).
 - ADR-0001, ADR-0005.

@@ -5,6 +5,17 @@ published release yet; entries remain under `[Unreleased]`.
 
 ## [Unreleased]
 
+### Synchronization with Anti-Gravital (2026-11-22)
+
+Changed:
+
+- RFC-0004 section 4.5 now inherits the seven implementation prerequisites
+  added to Anti-Gravital RFC-0024 on 2026-11-21. No MCP code is authorized
+  until the consumer has machine-readable output, plan/apply, an audit sink,
+  the `Secret<T>` contract and typed executors for every command group.
+- `docs/INDEX.md` records the shared cross-repository documents and which
+  Anti-Gravital revisions do not affect the Fabric boundary.
+
 ### Initial specification
 
 Added (documentation only; no implementation):

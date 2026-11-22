@@ -25,6 +25,21 @@
 - `docs/kaizen/loop/` — loop rules, configuration, prompts and security
   checklist. `docs/kaizen/journal/` — one entry per iteration.
 
+## Cross-repository synchronization
+
+Fabric and Anti-Gravital share contracts as data, never as Rust dependencies.
+The following Anti-Gravital documents are referenced by this specification:
+
+- `ADR-0016` — open interfaces between Anti-Gravital and Gravital Fabric.
+- `RFC-0024` (amended 2026-11-21) — shared capability-scoped MCP interface and
+  its seven implementation prerequisites; inherited by RFC-0004 section 4.5.
+- `ADR-0017` — MCP does not grant privilege by virtue of being a machine.
+
+Anti-Gravital revisions that do not change the Fabric boundary (RFC-0025
+ag-data ORM, RFC-0026 chrono replacement, RFC-0027 chumsky upgrade, ADR-0018
+reqwest provider and ADR-0019 OTLP transport) are tracked in that repository
+only. Last synchronization: 2026-11-22.
+
 ## Design artifacts
 
 - `docs/diagrams/` — Mermaid diagrams of layers, data flow and migration.
