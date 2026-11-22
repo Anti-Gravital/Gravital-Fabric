@@ -5,6 +5,27 @@ published release yet; entries remain under `[Unreleased]`.
 
 ## [Unreleased]
 
+### Fix concurrent register race (issue #3, 2026-11-22)
+
+- Fixed the spurious failure when several `fabric-node register` processes write
+  to the same `--state` path. `write_state` no longer uses a shared
+  `.<file>.tmp` name: it creates a unique per-writer temporary file in the
+  destination directory with `create_new` (atomic O_CREAT|O_EXCL) and retries on
+  collision, writes the document, then moves it onto the destination with the
+  same atomic rename. Failure cleanup removes only the file that writer
+  created, so no writer can delete another writer's temporary file.
+- The JSON state format is unchanged: `state_version`, `registered_at_unix` and
+  the nested `manifest` are produced by the same code as before.
+- Added `concurrent_registers_to_one_state_path_all_succeed`: 32 concurrent
+  processes against one path, all exit 0, final state is whole JSON with no
+  temporary leftovers and no sleeps. Verified 10/10 reruns and 5 trials of 32
+  writers of the original shell reproduction with zero failures.
+- Updated `docs/audits/fabric-user-journey.md` with the fix evidence; issue #3
+  is closed after full verification.
+- Verified: `cargo fmt`, `cargo check`, `cargo clippy -D warnings`, 16 unit and
+  7 integration tests, `scripts/kaizen check`, `git diff --check`. No new
+  dependency; the Phase 1 gate and the Fabric alpha position are unchanged.
+
 ### Real-user terminal QA of the local prototype (2026-11-22)
 
 - Added `docs/audits/fabric-user-journey.md`: a second tester followed the

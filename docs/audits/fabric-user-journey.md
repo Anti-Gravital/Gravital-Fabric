@@ -8,7 +8,9 @@ only the checkout plus a Rust toolchain. The tester followed the commands in the
 root `README.md` and `crates/fabric-node/README.md` as written, timed them,
 captured verbatim output, validated the JSON against the published contract and
 checked determinism and repeat registration. One reproducible defect was found
-and reported as Fabric issue #3. No issue was closed.
+and reported as Fabric issue #3. The original reproduction below is kept as
+historical evidence; the defect was subsequently fixed and verified in wave 11
+on branch `community/fabric-fix-11` (see "Issue #3 fix verification" below).
 
 ## Honest position
 
@@ -144,7 +146,11 @@ written; no daemon, socket, container or service was started.
 
 All observed exit codes match the documented contract: 0 success, 1 local I/O
 failure, 2 invalid command line. The exact commands in the README, with and
-without `--offline`, behave identically.
+without `--offline`, behave identically. The table above records the pre-fix
+run at commit `910c3a0`; after the wave-11 fix the nonexistent-directory case
+still exits 1, but the temporary path in the message is unique to the writer
+(pid, sequence and nanoseconds) and the prefix is `cannot create temporary
+state file`.
 
 ## Output inspection
 
@@ -191,8 +197,9 @@ will see a different file on every run.
   and network interfaces on a real Linux host.
 - Derive a stable, documented, non-cryptographic local identifier.
 - Emit JSON that validates against the published versioned schema.
-- Write a local registration state file atomically via a temporary file and
-  rename, to a caller-selected path.
+- Write a local registration state file atomically via a unique per-invocation
+  temporary file and rename, to a caller-selected path (unique naming added in
+  wave 11; see the fix verification below).
 - --version, --help, usage, and documented exit codes.
 
 ## What a user would expect but cannot do yet
@@ -256,16 +263,58 @@ fabric-node: cannot rename state file to /tmp/.../state.json: No such file or di
 The final state file remains valid JSON, but one or more callers observe a
 spurious failure. Reported as
 [Anti-Gravital/Gravital-Fabric issue #3](https://github.com/Anti-Gravital/Gravital-Fabric/issues/3)
-with labels `bug` and `good first issue`. Not fixed by this audit; no issue was
-closed. Suggested direction: a unique per-invocation temporary name and a
-concurrency integration test.
+with labels `bug` and `good first issue`. Not fixed by this audit, which changed
+no source code. Suggested direction: a unique per-invocation temporary name and
+a concurrency integration test.
+
+### Issue #3 fix verification (wave 11, 2026-11-22)
+
+Fix landed on branch `community/fabric-fix-11` (descriptor
+`docs/kaizen/pr-drafts/community-fabric-fix-11.md`). `write_state` no longer
+uses `.<file_name>.tmp`. It builds a name containing the process id, an atomic
+in-process sequence, nanoseconds and a retry index (`<file>.<pid>.<seq>.
+<nanos>.<attempt>.tmp`) in the destination directory, opens it with
+`create_new` (atomic O_CREAT|O_EXCL) and retries with a fresh name on a name
+collision (at most 64 attempts). The document is written to that handle and
+moved onto the destination with the same atomic `fs::rename`. Every cleanup
+path removes only the path this writer exclusively created, so a failing
+writer can never delete another writer's temporary file. The JSON state
+format is byte-for-byte unchanged: `state_version`, `registered_at_unix` and
+the nested `manifest` are produced by the same `to_json` function.
+
+A regression test in `crates/fabric-node/tests/cli.rs`,
+`concurrent_registers_to_one_state_path_all_succeed`, spawns 32 real
+`fabric-node` processes at once against one `--state` path, asserts every
+child exits 0, checks the final file is a whole JSON object with balanced
+braces and the required fields, and asserts no `.tmp` file is left behind.
+No sleeps or timing assumptions are used. The same reproduction as the
+original report was rerun against the rebuilt binary.
+
+| Evidence | Real result |
+| --- | --- |
+| Regression test, 32 concurrent processes | all 32 exit 0; final state whole JSON; no temp leftovers |
+| Regression test repeated 10 times | 10 passed, 0 failed |
+| Real binary, 5 trials x 32 concurrent writers | 0 failing invocations in every trial |
+| `cargo fmt --all -- --check` | passed |
+| `cargo check --workspace --locked --offline` | passed |
+| `cargo clippy --workspace --all-targets --locked --offline -- -D warnings` | passed, no warnings |
+| `cargo test --workspace --locked --offline` | passed: 16 unit + 7 integration tests, 0 failed |
+| `scripts/kaizen check` | all green: descriptors, content policies, workflow scopes, format, lint, tests, debt 0 <= 0 |
+| `git diff --check` | clean |
+
+Build target for these measurements: private, disk-backed target dir outside
+the repository (shared with the wave-11 agents); `CARGO_INCREMENTAL=0`,
+`CARGO_PROFILE_TEST_DEBUG=0`. Same host and toolchain as the environment table
+above. The Phase 1 gate and the Fabric alpha position are unchanged by this
+local I/O fix.
 
 ## Top improvements for Fabric Phase 1
 
 Ordered by what a tester hits first, not by implementation order:
 
 1. Unique temporary files in `register` (issue #3) plus a concurrent-process
-   test, so repeated registrations cannot fail spuriously.
+   test, so repeated registrations cannot fail spuriously. Addressed in wave 11;
+   see the fix verification above.
 2. An installable agent with a documented install path, rather than only
    `cargo run` from a checkout. This is the roadmap Phase 1 deliverable.
 3. Cryptographic node identity and real control-plane registration; supersede

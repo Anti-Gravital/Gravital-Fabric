@@ -2,7 +2,7 @@
 
 use std::fs;
 use std::path::{Path, PathBuf};
-use std::process::{Command, Output};
+use std::process::{Command, Output, Stdio};
 use std::sync::atomic::{AtomicU64, Ordering};
 
 static COUNTER: AtomicU64 = AtomicU64::new(0);
@@ -132,6 +132,70 @@ fn usage_errors_exit_nonzero() {
         .output()
         .expect("missing state value");
     assert_eq!(missing_value.status.code(), Some(2));
+}
+
+#[test]
+fn concurrent_registers_to_one_state_path_all_succeed() {
+    // Regression for issue #3: the old fixed ".<file>.tmp" name made one
+    // writer rename away the file another writer was about to rename.
+    const WRITERS: usize = 32;
+    let directory = temporary_directory();
+    let state = directory.join("state.json");
+
+    let mut children = Vec::with_capacity(WRITERS);
+    for _ in 0..WRITERS {
+        children.push(
+            binary()
+                .args(["register", "--state"])
+                .arg(&state)
+                .stdout(Stdio::piped())
+                .stderr(Stdio::piped())
+                .spawn()
+                .expect("spawn concurrent register"),
+        );
+    }
+
+    for (index, child) in children.into_iter().enumerate() {
+        let output = child.wait_with_output().expect("wait for register");
+        assert!(
+            output.status.success(),
+            "concurrent writer {index} failed: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
+
+    // The last rename wins; the resulting document must still be whole JSON.
+    let content = fs::read_to_string(&state).expect("read final state file");
+    assert!(
+        content.starts_with("{\n"),
+        "state does not start with an object"
+    );
+    assert!(content.ends_with("}\n"), "state is truncated");
+    assert_eq!(
+        content.matches('{').count(),
+        content.matches('}').count(),
+        "unbalanced braces in final state"
+    );
+    for field in [
+        "\"state_version\": \"1.0.0\"",
+        "\"registered_at_unix\"",
+        "\"manifest\": {",
+        "\"manifest_version\": \"1.0.0\"",
+    ] {
+        assert!(content.contains(field), "missing {field} in {content}");
+    }
+
+    let leftovers: Vec<String> = fs::read_dir(&directory)
+        .expect("read fixture dir")
+        .filter_map(Result::ok)
+        .map(|entry| entry.file_name().to_string_lossy().into_owned())
+        .filter(|name| name.ends_with(".tmp"))
+        .collect();
+    assert!(
+        leftovers.is_empty(),
+        "temporary files left behind: {leftovers:?}"
+    );
+    fs::remove_dir_all(&directory).expect("remove fixture dir");
 }
 
 #[test]

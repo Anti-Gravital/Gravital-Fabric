@@ -3,14 +3,20 @@
 //! Registration here means writing a JSON document to a caller-selected local
 //! path. It does not contact a control plane or claim a Fabric registration.
 
-use std::ffi::OsString;
-use std::fs;
+use std::ffi::{OsStr, OsString};
+use std::fs::{self, OpenOptions};
+use std::io::Write;
 use std::path::Path;
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use crate::manifest::{self, Manifest};
 
 pub const STATE_VERSION: &str = "1.0.0";
+
+// Distinguishes writers that share a process (threads) in addition to the
+// process id and timestamp used in the temporary name.
+static TEMP_SEQUENCE: AtomicU64 = AtomicU64::new(0);
 
 pub fn write_state(path: &Path, manifest: &Manifest) -> Result<u64, String> {
     let registered_at = SystemTime::now()
@@ -21,14 +27,52 @@ pub fn write_state(path: &Path, manifest: &Manifest) -> Result<u64, String> {
     let file_name = path
         .file_name()
         .ok_or_else(|| "state path has no file name".to_string())?;
-    let mut temporary_name = OsString::from(".");
-    temporary_name.push(file_name);
-    temporary_name.push(".tmp");
-    let temporary_path = path.with_file_name(temporary_name);
 
-    fs::write(&temporary_path, json)
-        .map_err(|error| format!("cannot write {}: {error}", temporary_path.display()))?;
+    // The temporary file lives in the destination directory so the final
+    // rename stays on one filesystem and is atomic. Each writer gets its own
+    // name, so no writer can rename or delete another writer's file.
+    // create_new is an atomic O_CREAT|O_EXCL: a name collision is detected
+    // instead of silently opening a shared path, and is retried with a fresh
+    // name. This keeps concurrent registrations independent (last rename wins).
+    const MAX_ATTEMPTS: u64 = 64;
+    let mut attempt = 0u64;
+    let (temporary_path, mut file) = loop {
+        let candidate = path.with_file_name(temporary_name(file_name, attempt));
+        match OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&candidate)
+        {
+            Ok(file) => break (candidate, file),
+            Err(error)
+                if error.kind() == std::io::ErrorKind::AlreadyExists
+                    && attempt + 1 < MAX_ATTEMPTS =>
+            {
+                attempt += 1;
+                continue;
+            }
+            Err(error) => {
+                return Err(format!(
+                    "cannot create temporary state file {}: {error}",
+                    candidate.display()
+                ));
+            }
+        }
+    };
+
+    if let Err(error) = file.write_all(json.as_bytes()) {
+        // Only this writer's uniquely named file is removed here.
+        let _ = fs::remove_file(&temporary_path);
+        return Err(format!(
+            "cannot write {}: {error}",
+            temporary_path.display()
+        ));
+    }
+    drop(file);
+
     if let Err(error) = fs::rename(&temporary_path, path) {
+        // The rename may have been observed by another writer; removing this
+        // path is still safe because no other writer ever uses this name.
         let _ = fs::remove_file(&temporary_path);
         return Err(format!(
             "cannot rename state file to {}: {error}",
@@ -36,6 +80,18 @@ pub fn write_state(path: &Path, manifest: &Manifest) -> Result<u64, String> {
         ));
     }
     Ok(registered_at)
+}
+
+fn temporary_name(file_name: &OsStr, attempt: u64) -> OsString {
+    let pid = std::process::id();
+    let sequence = TEMP_SEQUENCE.fetch_add(1, Ordering::Relaxed);
+    let nanos = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map_or(0, |duration| duration.as_nanos() as u64);
+    let mut name = OsString::from(".");
+    name.push(file_name);
+    name.push(format!(".{pid}.{sequence}.{nanos}.{attempt}.tmp"));
+    name
 }
 
 fn to_json(registered_at: u64, manifest: &Manifest) -> String {
