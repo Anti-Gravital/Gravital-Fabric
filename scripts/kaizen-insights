@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Build and run the offline Rust telemetry aggregator.
+set -euo pipefail
+ROOT="$(git rev-parse --show-toplevel)"; cd "$ROOT"
+BIN="tools/kaizen-insights/target/release/kaizen-insights"
+if [ ! -x "$BIN" ]; then
+  command -v cargo >/dev/null 2>&1 || { echo "kaizen-insights: cargo is required to build the tool" >&2; exit 1; }
+  cargo build --release --manifest-path tools/kaizen-insights/Cargo.toml >/dev/null
+fi
+exec "$BIN" "$@"

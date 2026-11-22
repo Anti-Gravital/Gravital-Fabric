@@ -1,4 +1,4 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "instructions": [".kaizen/RULES.md"]
+  "instructions": [".kaizen/RULES.md", ".kaizen/loop/LOOP.md"]
 }

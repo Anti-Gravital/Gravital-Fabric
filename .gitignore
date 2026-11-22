@@ -1,0 +1,5 @@
+# Kaizen loop runtime state (never versioned)
+.kaizen/loop/state/
+
+# Rust build output
+target/

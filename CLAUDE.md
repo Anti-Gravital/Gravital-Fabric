@@ -89,3 +89,8 @@ governs. Before declaring a task complete, run `scripts/kaizen check` and
 report the real result. Start a task with `scripts/kaizen start <branch>`. Never
 bypass hooks or relax `.kaizen/baseline.json` without human approval (rules K-5
 and K-10).
+
+The external loop extends this constitution through `.kaizen/loop/LOOP.md`.
+It is installed paused at autonomy level 1. Loop iterations are launched by
+`scripts/kaizen-loop`; an agent handles only the task in the selected prompt
+and never pushes, opens PRs or merges.

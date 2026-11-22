@@ -33,3 +33,13 @@ Added (documentation only; no implementation):
 - Content policies enforce the existing rules on commit length, emojis and
   AI-tool attribution. Generated rules and templates are bilingual with
   English canonical.
+
+### Continuous loop
+
+- RFC-0007 and ADR-0007 add an external Kaizen loop: versioned rules, five
+  loop prompts, a journal, an autonomy framework with brakes, synthetic
+  telemetry schemas and two CI workflows.
+- The loop is installed paused at autonomy level 1. Label creation, tokens,
+  secrets and branch protection remain human setup tasks.
+- Telemetry aggregation is implemented as an offline Rust tool in
+  `tools/kaizen-insights/`, keeping the Rust-only rule unchanged.

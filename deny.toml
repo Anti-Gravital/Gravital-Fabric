@@ -1,0 +1,15 @@
+# License policy for the offline governance tool (RFC-0007).
+[licenses]
+allow = [
+    "Apache-2.0",
+    "MIT",
+    "Unicode-3.0",
+]
+confidence-threshold = 0.8
+
+[bans]
+multiple-versions = "allow"
+wildcards = "allow"
+
+[advisories]
+yanked = "warn"

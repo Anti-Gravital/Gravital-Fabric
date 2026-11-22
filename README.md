@@ -65,8 +65,10 @@ and data in documented formats without an active account on the platform.
 
 ### Status
 
-Specification stage. No implementation is published yet. The source of truth
-is `docs/master/`; decisions are in `docs/rfc/` and `docs/adr/`.
+Specification stage. No product implementation is published yet. The only
+executable code in the repository is an offline governance tool at
+`tools/kaizen-insights/`. The source of truth is `docs/master/`; decisions are
+in `docs/rfc/` and `docs/adr/`.
 
 Rust is the only implementation language. Licence: Apache-2.0.
 
@@ -136,7 +138,9 @@ snapshots y datos en formatos documentados, sin necesidad de cuenta activa.
 
 ### Estado
 
-Fase de especificacion. Aun no hay implementacion publicada. La fuente de
-verdad es `docs/master/`; las decisiones estan en `docs/rfc/` y `docs/adr/`.
+Fase de especificacion. Aun no hay implementacion de producto publicada. El
+unico codigo ejecutable del repositorio es una herramienta de gobernanza
+sin conexion en `tools/kaizen-insights/`. La fuente de verdad es
+`docs/master/`; las decisiones estan en `docs/rfc/` y `docs/adr/`.
 
 Rust es el unico lenguaje de implementacion. Licencia: Apache-2.0.

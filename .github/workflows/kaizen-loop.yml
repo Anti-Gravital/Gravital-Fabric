@@ -1,0 +1,53 @@
+name: kaizen-loop
+on:
+  schedule:
+    - cron: "17 */3 * * *"
+  workflow_dispatch:
+    inputs:
+      loop:
+        description: "dev | ops | sweep | research | product (empty = rotate)"
+        required: false
+
+concurrency:
+  group: kaizen-loop
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  actions: read
+  variables: write
+
+jobs:
+  iterate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.KAIZEN_TOKEN }}
+      # Add the Rust toolchain setup step before enabling the insights step.
+      # Install only the CLI of the selected agent (KL_AGENT=opencode).
+      - name: Configure git credentials
+        env:
+          GH_TOKEN: ${{ secrets.KAIZEN_TOKEN }}
+        run: |
+          gh auth setup-git
+          git config --global user.name "kaizen-bot"
+          git config --global user.email "kaizen-bot@users.noreply.github.com"
+      - name: Telemetry to insights (optional, read-only)
+        if: ${{ hashFiles('scripts/kaizen-insights') != '' }}
+        env:
+          GH_TOKEN: ${{ secrets.KAIZEN_TOKEN }}
+        run: |
+          # Adapt this line: export sanitized events to telemetry/events/*.jsonl from your store.
+          scripts/kaizen-insights --create-issues || true
+      - name: Loop iteration
+        env:
+          GH_TOKEN: ${{ secrets.KAIZEN_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: scripts/kaizen-loop once "${{ github.event.inputs.loop }}"

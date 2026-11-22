@@ -20,6 +20,10 @@
   metric series.
 - `scripts/kaizen` and `.githooks/` — local checks and hooks.
 - RFC-0006 and ADR-0006 authorise the governance CI and hooks.
+- RFC-0007 and ADR-0007 authorise the external loop and the offline Rust
+  insights tool in `tools/kaizen-insights/`.
+- `docs/kaizen/loop/` — loop rules, configuration, prompts and security
+  checklist. `docs/kaizen/journal/` — one entry per iteration.
 
 ## Design artifacts
 
