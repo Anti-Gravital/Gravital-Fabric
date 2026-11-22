@@ -57,6 +57,10 @@ only. Last synchronization: 2026-11-22.
 - `docs/audits/fabric-node-prototype.md` — verbatim run on a real host,
   verification results and the exact next Phase 1 steps. The Phase 1 gate is
   still open; this is not a Fabric alpha.
+- `docs/audits/fabric-user-journey.md` — second tester's real-terminal journey:
+  timings, verbatim output, schema validation, determinism, registration
+  repeatability, the reproducible concurrency defect (issue #3) and the top
+  Phase 1 improvements. Still a prototype, not an alpha.
 
 These documents do not change the boundary in RFC-0001 or ADR-0001; they make
 the existing boundary explicit for alpha testers.

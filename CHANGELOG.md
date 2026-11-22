@@ -5,6 +5,26 @@ published release yet; entries remain under `[Unreleased]`.
 
 ## [Unreleased]
 
+### Real-user terminal QA of the local prototype (2026-11-22)
+
+- Added `docs/audits/fabric-user-journey.md`: a second tester followed the
+  documented `cargo run` commands as written in an isolated worktree with a
+  private target dir, timing each command and recording verbatim output. Cold
+  build 1.74 s, `manifest` 0.39 s, `register` 0.15 s (Cargo included); direct
+  binary 0.02 s and 0.01 s. The manifest and the nested state manifest validate
+  against the published JSON Schema; two `manifest` runs are byte-identical;
+  `register` is intentionally not idempotent because it rewrites the timestamp.
+- Documented the honest gap that the registration state document has no
+  published schema (only the discovery manifest does) and that there is no
+  installer or `cargo install` path: a user can only build from a checkout.
+- Reported a reproducible real defect as Fabric issue #3: concurrent `register`
+  calls to the same `--state` path can fail spuriously because `write_state`
+  uses a fixed temporary filename. Evidence: 1-2 failures in 24-32 parallel
+  writers across four trials, with verbatim stderr. No issue was closed and no
+  source code was changed by this QA pass.
+- `docs/INDEX.md` links the new audit. Fabric remains a specification with a
+  local-only prototype; Phase 1 is partial and this is not a Fabric alpha.
+
 ### First local node prototype (partial Phase 1)
 
 - RFC-0008 authorizes the first crate and the first versioned contract layout;
