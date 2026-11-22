@@ -5,6 +5,21 @@ published release yet; entries remain under `[Unreleased]`.
 
 ## [Unreleased]
 
+### Alpha positioning (documentation only)
+
+- `docs/releases/alpha-positioning.md` states honestly that Fabric is
+  specification-only: it records what is specified, what is not implemented,
+  the contract boundary with Anti-Gravital (ADR-0001 and Anti-Gravital
+  ADR-0016), the L1/L2/L3 levels, the prototype scenarios a tester can run with
+  Anti-Gravital alone, the scenarios that need Fabric code, a decision table,
+  the Phase 1 preconditions and the condition for Fabric's own alpha.
+- `docs/examples/anti-gravital-prototype.md` points testers to the external
+  alpha walkthrough in the sibling Anti-Gravital repository and repeats that
+  Fabric has no product implementation yet.
+- `docs/INDEX.md` and the README status section link both documents; the
+  bilingual status statement is unchanged: Fabric remains at specification
+  stage.
+
 ### Fixes
 
 - `.github/workflows/kaizen-loop.yml` no longer declares `variables: write`, an

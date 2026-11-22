@@ -40,6 +40,17 @@ ag-data ORM, RFC-0026 chrono replacement, RFC-0027 chumsky upgrade, ADR-0018
 reqwest provider and ADR-0019 OTLP transport) are tracked in that repository
 only. Last synchronization: 2026-11-22.
 
+## Releases and prototypes
+
+- `docs/releases/alpha-positioning.md` — what Fabric specifies, what is not
+  implemented, the Anti-Gravital contract boundary, the three portability
+  levels, tester decision table and Phase 1 preconditions.
+- `docs/examples/anti-gravital-prototype.md` — points testers to the external
+  Anti-Gravital alpha walkthrough and states that Fabric is specification-only.
+
+These documents do not change the boundary in RFC-0001 or ADR-0001; they make
+the existing boundary explicit for alpha testers.
+
 ## Design artifacts
 
 - `docs/diagrams/` — Mermaid diagrams of layers, data flow and migration.

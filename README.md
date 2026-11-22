@@ -70,6 +70,12 @@ executable code in the repository is an offline governance tool at
 `tools/kaizen-insights/`. The source of truth is `docs/master/`; decisions are
 in `docs/rfc/` and `docs/adr/`.
 
+For alpha testers: the [alpha positioning and prototype guide](docs/releases/alpha-positioning.md)
+states what can be exercised today with the Anti-Gravital alpha and what still
+needs Fabric code. The [external prototype pointer](docs/examples/anti-gravital-prototype.md)
+links to that walkthrough. Fabric is specification-only; the Anti-Gravital alpha
+is not a Fabric alpha.
+
 Rust is the only implementation language. Licence: Apache-2.0.
 
 ---
@@ -142,5 +148,11 @@ Fase de especificacion. Aun no hay implementacion de producto publicada. El
 unico codigo ejecutable del repositorio es una herramienta de gobernanza
 sin conexion en `tools/kaizen-insights/`. La fuente de verdad es
 `docs/master/`; las decisiones estan en `docs/rfc/` y `docs/adr/`.
+
+Para quienes prueban el alpha: la [guia de posicionamiento alpha y prototipo](docs/releases/alpha-positioning.md)
+indica que se puede ejecutar hoy con el alpha de Anti-Gravital y que requiere
+codigo de Fabric. El [puntero al prototipo externo](docs/examples/anti-gravital-prototype.md)
+enlaza ese recorrido. Fabric esta en fase de especificacion; el alpha de
+Anti-Gravital no es un alpha de Fabric.
 
 Rust es el unico lenguaje de implementacion. Licencia: Apache-2.0.
