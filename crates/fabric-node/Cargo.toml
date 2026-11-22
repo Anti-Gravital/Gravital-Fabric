@@ -1,0 +1,9 @@
+[package]
+name = "fabric-node"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+description = "Local-only hardware discovery prototype for Gravital Fabric"
+publish = false
+
+[dependencies]

@@ -1,0 +1,4 @@
+[workspace]
+members = ["crates/fabric-node"]
+exclude = ["tools/kaizen-insights"]
+resolver = "2"

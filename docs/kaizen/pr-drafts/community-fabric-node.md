@@ -18,6 +18,7 @@ Phase 1 (partial), `fabric-node` engine, first Cargo workspace and first version
 - `docs/adr/0001-no-compile-time-dependency-with-anti-gravital.md`, `docs/adr/0005-rust-only.md`
 - `docs/master/GRAVITAL-FABRIC-Hoja-de-Ruta.md` Phase 1 (unchanged; gate stays open)
 - `docs/releases/alpha-positioning.md`, `docs/INDEX.md`, `README.md`, `CHANGELOG.md`
+- `scripts/kaizen`: fix the zero-debt pipefail abort exposed by the first `crates/` directory (RFC-0008 section 4.4)
 
 ## Plan de prueba / Test plan
 - `cargo fmt --all -- --check`
@@ -25,7 +26,7 @@ Phase 1 (partial), `fabric-node` engine, first Cargo workspace and first version
 - `cargo clippy --workspace --all-targets --locked --offline -- -D warnings`
 - `cargo test --workspace --locked --offline`
 - `cargo run -p fabric-node -- manifest` (real host, JSON on stdout)
-- `cargo run -p fabric-node -- register --state /tmp/opencode/fabric-node-state.json`
+- `cargo run -p fabric-node -- register --state /tmp/fabric-node-state.json`
 - `scripts/kaizen check`, `git diff --check`, emoji and AI-attribution scans
 - Evidence is recorded in `docs/audits/fabric-node-prototype.md`.
 

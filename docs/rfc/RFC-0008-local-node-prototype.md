@@ -85,7 +85,11 @@ A Cargo workspace root is added with `crates/fabric-node` as a member and
 keeps building with its own `Cargo.lock`. `.kaizen/config.env` gets real
 `KZ_FMT_CMD`, `KZ_LINT_CMD` and `KZ_TEST_CMD` values so `scripts/kaizen check`
 validates the crate. No CI permission, branch protection or baseline change is
-part of this RFC.
+part of this RFC. Adding the first `crates/` directory exposes a latent bug in
+`scripts/kaizen`: its debt counter piped an empty `grep` result into `wc` under
+`set -o pipefail`, so a clean tree aborted the check instead of reporting zero.
+The counter now treats no matches as zero; the baseline stays at zero and the
+check still fails on real debt. This fix is part of the tooling wiring.
 
 ### 4.5 Documentation
 
