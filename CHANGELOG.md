@@ -5,6 +5,17 @@ published release yet; entries remain under `[Unreleased]`.
 
 ## [Unreleased]
 
+### Fixes
+
+- `.github/workflows/kaizen-loop.yml` no longer declares `variables: write`, an
+  invalid `GITHUB_TOKEN` permission scope that made GitHub reject the whole
+  file, register it under its path and fail on every push with zero jobs
+  (issue #1). The pause mechanism is unaffected: `KAIZEN_PAUSED` is read and
+  written through `secrets.KAIZEN_TOKEN`, not the workflow token.
+- `scripts/kaizen check` now validates workflow `permissions` scopes against
+  GitHub's documented allowlist (`--only workflows`), so this class of schema
+  error is caught locally before push.
+
 ### Synchronization with Anti-Gravital (2026-11-22)
 
 Changed:

@@ -7,6 +7,9 @@ KZ_DRAFTS_DIR="${KZ_DRAFTS_DIR:-docs/kaizen/pr-drafts}"
 KZ_DEFAULT_BRANCH="${KZ_DEFAULT_BRANCH:-main}"
 KZ_SRC_GLOBS="${KZ_SRC_GLOBS:-src lib app pkg crates}"
 BASE=".kaizen/baseline.json"
+# Valid GITHUB_TOKEN permission scopes for workflow `permissions:` blocks.
+# Reference: GitHub Actions workflow syntax reference, "permissions" table.
+KZ_WORKFLOW_PERMISSION_SCOPES="actions artifact-metadata attestations checks code-quality contents copilot-requests deployments discussions id-token issues models packages pages pull-requests security-events statuses vulnerability-alerts"
 FAIL=0
 fail() { echo "FAIL: $*" >&2; FAIL=1; }
 ok()   { [ "${QUIET:-0}" = "1" ] || echo "ok: $*"; }
@@ -59,6 +62,39 @@ check_policy() {
   ok "content policies"
 }
 
+# GitHub rejects a workflow whose `permissions:` block contains an unknown
+# scope: it registers the file path as the workflow name and fails on push
+# with zero jobs (Fabric issue #1). YAML parsers do not catch this, so check
+# the scopes explicitly without an external dependency.
+check_workflows() {
+  local f line scope in_perm found=0
+  for f in .github/workflows/*.yml .github/workflows/*.yaml; do
+    [ -e "$f" ] || continue
+    found=1
+    in_perm=0
+    while IFS= read -r line || [ -n "$line" ]; do
+      if [[ "$line" =~ ^permissions:[[:space:]]*$ ]]; then
+        in_perm=1
+        continue
+      fi
+      if [ "$in_perm" = 1 ]; then
+        if [[ "$line" =~ ^[^[:space:]#] ]]; then
+          in_perm=0
+          continue
+        fi
+        if [[ "$line" =~ ^[[:space:]]+([a-z][a-z0-9-]*):[[:space:]]*(read|write|none)[[:space:]]*(#.*)?$ ]]; then
+          scope="${BASH_REMATCH[1]}"
+          case " $KZ_WORKFLOW_PERMISSION_SCOPES " in
+            *" $scope "*) ;;
+            *) fail "$f: invalid GITHUB_TOKEN permission scope '$scope'";;
+          esac
+        fi
+      fi
+    done < "$f"
+  done
+  [ "$found" = 1 ] && ok "workflow permission scopes validated" || ok "no workflow files"
+}
+
 check_ratchet() {
   [ -f "$BASE" ] || { ok "no baseline (run: scripts/kaizen baseline)"; return; }
   local debt cov warn bdebt bcov bwarn
@@ -95,9 +131,10 @@ cmd_check() {
   case "$only" in
     descriptors) check_descriptors;;
     policy) check_policy;;
+    workflows) check_workflows;;
     ratchet) check_ratchet;;
-    "") check_descriptors; check_policy; check_tests; check_ratchet;;
-    *) echo "usage: check [--only descriptors|policy|ratchet] [--quiet]"; exit 2;;
+    "") check_descriptors; check_policy; check_workflows; check_tests; check_ratchet;;
+    *) echo "usage: check [--only descriptors|policy|workflows|ratchet] [--quiet]"; exit 2;;
   esac
   [ $FAIL = 0 ] || { echo "kaizen check: FAILED" >&2; exit 1; }
   ok "kaizen check: all green"
