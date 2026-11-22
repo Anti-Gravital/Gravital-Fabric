@@ -17,3 +17,4 @@ ADR.
 | 0005 | Functions runtime | accepted | `RFC-0005-functions-runtime.md` |
 | 0006 | Kaizen continuous governance | accepted | `RFC-0006-kaizen-governance.md` |
 | 0007 | Kaizen loop and offline insights tool | accepted | `RFC-0007-kaizen-loop.md` |
+| 0008 | First local node prototype and contract layout | accepted for prototype slice | `RFC-0008-local-node-prototype.md` |

@@ -9,3 +9,4 @@
 | 0005 | Rust is the only implementation language | accepted | `0005-rust-only.md` |
 | 0006 | Kaizen is a subordinate governance adapter | accepted | `0006-kaizen-governance.md` |
 | 0007 | External loop with repository memory | accepted | `0007-kaizen-loop.md` |
+| 0008 | Deterministic local node identity for the prototype | accepted for prototype slice | `0008-deterministic-local-node-identity.md` |

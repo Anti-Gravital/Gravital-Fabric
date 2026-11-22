@@ -1,0 +1,28 @@
+{
+  "manifest_version": "1.0.0",
+  "node": {
+    "node_id": "00000000-0000-0000-0000-000000000000",
+    "identity_source": "machine-id",
+    "os": "linux",
+    "arch": "x86_64",
+    "hostname": "example-host"
+  },
+  "hardware": {
+    "cpu_count": 4,
+    "memory_total_bytes": 8589934592,
+    "memory_source": "proc-meminfo",
+    "block_devices": [
+      {
+        "name": "sda",
+        "size_bytes": 536870912000
+      }
+    ],
+    "network_interfaces": [
+      {
+        "name": "eth0",
+        "mac": "02:00:00:00:00:01",
+        "state": "up"
+      }
+    ]
+  }
+}
